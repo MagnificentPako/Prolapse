@@ -4,8 +4,8 @@
 callback(Token, Msg) :-
     Msg.t = "MESSAGE_CREATE",
     (\+ me(Msg.d.author.id)),
-    send_message(Token, Msg.d.channel_id, Msg.d.content),
-    ping("message").
+    writeln("received a message"),
+    send_message(Token, Msg.d.channel_id, Msg.d.content).
 
 callback(_, Msg) :-
     Msg.t = "READY",

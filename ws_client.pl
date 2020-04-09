@@ -6,7 +6,8 @@
 
 heartbeat(Time, WS) :-
     repeat,
-    sleep(Time / 1000),
+    ActualTime is Time / 1000,
+    sleep(ActualTime),
     heartbeatSeq(S),
     Object = json{ op:1, d:S},
     atom_json_dict(J, Object, []),
@@ -39,6 +40,6 @@ start_ws(Token, Callback) :-
     write("Starting Bot"), nl,
     http_open_websocket(URL, WS, []),
     read_json(WS, HELLO),
-    thread_create(heartbeat(HELLO.d.heartbeat_interval, WS), _),
+    thread_create(call(heartbeat, HELLO.d.heartbeat_interval, WS), _),
     identify_client(WS, Token),
     ws_loop(Token, WS, Callback).
