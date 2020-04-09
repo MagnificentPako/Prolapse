@@ -13,10 +13,6 @@ heartbeat(Time, WS) :-
     ws_send(WS, text(J)),
     1 < 0.
 
-rw(WS) :-
-    ws_receive(WS, Reply),
-    print(Reply.data), nl.
-
 read_json(WS, J) :-
     ws_receive(WS, Reply),
     atom_json_dict(Reply.data, J, []).  
@@ -29,10 +25,6 @@ identify_client(WS, Token) :-
                                            , '$device':  "Discolog 0.1" }}},
     atom_json_dict(JJ, Object, []),
     ws_send(WS, text(JJ)).
-
-ping(Data) :-
-    atom_concat('https://webhook.site/65d13614-a9f5-4229-a559-2746ee722ae0?s=', Data, URL),
-    http_get(URL, _, []).
 
 ws_loop(Token, WS, Callback) :-
     repeat,
