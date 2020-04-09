@@ -21,8 +21,8 @@ identify_client(WS, Token) :-
     Object = json{ op:2
                  , d: json{ token: Token
                          , properties: json{ '$os': "linux"
-                                           , '$browser': "Discolog 0.1"
-                                           , '$device':  "Discolog 0.1" }}},
+                                           , '$browser': "Prolapse 0.1"
+                                           , '$device':  "Prolapse 0.1" }}},
     atom_json_dict(JJ, Object, []),
     ws_send(WS, text(JJ)).
 
