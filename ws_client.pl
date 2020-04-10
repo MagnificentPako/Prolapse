@@ -42,3 +42,18 @@ start_ws(Token, Callback) :-
     thread_create(heartbeat(HELLO.d.heartbeat_interval, WS), _),
     identify_client(WS, Token),
     ws_loop(Token, WS, Callback).
+%% caching code stuf
+:- dynamic user/2.
+
+fetch_from_network(user(UserId), Res) :-
+    %% simulate network request
+    sleep(2),
+    %% store user in cache
+    User = some_user,
+    (retract(user(UserId, User)) ; asserta(user(UserId, User))),
+    Res = User.
+
+get_from_cache(user(UserId), Res) :- user(UserId, Res).
+
+get_user(UserId, Res) :- get_from_cache(user(UserId), Res), !.
+get_user(UserId, Res) :- fetch_from_network(user(UserId), Res), !.
