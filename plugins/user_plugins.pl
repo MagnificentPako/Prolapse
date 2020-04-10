@@ -13,7 +13,9 @@ handle_user_command(_, not_saved).
 command_handler("echo", Args, Msg) :-
     writeln(Args),
     print_term(Msg, []).
-    %% send_message(Msg.d.channel_id, Args).
+command_handler("reload", _, Msg) :-
+    make,
+    send_message(Msg.d.channel_id, "Reloaded.").
 %% command_handler("eval", [Args], Res) :-
 %%     atom_string(A, Args),
 %%     writeln(Args),
