@@ -30,13 +30,12 @@ identify_client(WS, Token) :-
     ws_send(WS, text(JJ)).
 
 ws_loop(WS, Callback) :-
-    me(token, Token),
     repeat,
     read_json(WS, Msg),
     abolish(heartbeatSeq/1),
     asserta(heartbeatSeq(Msg.s)),
     writeln(Msg.t),
-    call(Callback, Token, Msg),
+    call(Callback, Msg),
     fail.
 
 start_ws(Callback) :-
