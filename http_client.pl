@@ -3,11 +3,34 @@
 :- use_module(library(http/http_client)).
 :- use_module(library(http/http_json)).
 
-send_message(Channel, Message) :-
+:- dynamic me/2.
+
+ua(Ua) :- Ua = "Prolapse (https://github.com/MagnificentPako/Prolapse, 0.1)".
+
+endpoint(Segment, Params, Url) :-
+    string_concat("https://discordapp.com/api/v6/", Segment, Url_),
+    sformat(Url, Url_, Params).
+
+req_options(Auth, Ua, Options) :- 
+    Options = [ request_header(authorization=Auth)
+              , request_header(user_agen=Ua)
+              , json_object(dict)
+              ].
+
+do_request(get, Url, Res, O)        :- http_get(Url, Res, O).
+do_request(post(Data), Url, Res, O) :- http_post(Url, Data, Res, O).
+
+request(R, Url, Res) :-
     me(token, Token),
-    sformat(URL, "https://discordapp.com/api/v6/channels/~w/messages", [Channel]),
-    sformat(Auth, "Bot ~w", [Token]), 
-    http_post( URL
-             , json(json{ content:Message })
-             , _
-             , [request_header(authorization=Auth)]).
+    ua(Ua),
+    sformat(Auth, "Bot ~w", [Token]),
+    req_options(Auth, Ua, O),
+    do_request(R, Url, Res, O).
+
+send_message(Channel, Message) :-
+    endpoint("channels/~w/messages", [Channel], Url),
+    request(post(json(_{ content:Message })), Url, _).
+
+get_guild(GuildId, Guild) :-
+    endpoint("guilds/~w", [GuildId], Url),
+    request(get, Url, Guild).

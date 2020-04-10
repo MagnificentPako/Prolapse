@@ -1,6 +1,10 @@
+:- [http_client].
 
+:- dynamic me/2.
 
 handle_user_command(Msg) :-
+    me(id, Id),
+    (\+ Id = Msg.d.author.id),
    format("Trying to run command ~s\n", [Msg.d.content]), fail.
 handle_user_command(Msg) :-
     string_concat("::", Rest, Msg.d.content),
@@ -10,9 +14,9 @@ handle_user_command(_, not_saved).
 
 
 % not quite working yet
-command_handler("echo", Args, Msg) :-
-    writeln(Args),
-    print_term(Msg, []).
+command_handler("echo", _, Msg) :-
+    string_concat("::echo ", Rest, Msg.d.content),
+    send_message(Msg.d.channel_id, Rest).
 command_handler("reload", _, Msg) :-
     make,
     send_message(Msg.d.channel_id, "Reloaded.").

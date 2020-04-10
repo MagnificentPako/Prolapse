@@ -4,46 +4,39 @@
 :- use_module(library(http/http_client)).
 :- use_module(library(http/http_json)).
 :- dynamic heartbeatSeq/1.
+:- dynamic me/2.
 
 heartbeat(Time, WS) :-
     repeat,
     Seconds is Time / 1000,
     sleep(Seconds),
     heartbeatSeq(S),
-    writeln("Heartbeating"),
     Object = json{ op:1, d:S},
-    atom_json_dict(J, Object, []),
-    ws_send(WS, text(J)),
+    ws_send(WS, json(Object)),
     fail.
-
-read_json(WS, J) :-
-    ws_receive(WS, Reply),
-    atom_json_dict(Reply.data, J, []).
 
 identify_client(WS, Token) :-
     Object = json{ op:2
                  , d: json{ token: Token
-                         , properties: json{ '$os': "linux"
-                                           , '$browser': "Prolapse 0.1"
-                                           , '$device':  "Prolapse 0.1" }}},
-    atom_json_dict(JJ, Object, []),
-    ws_send(WS, text(JJ)).
+                          , properties: json{ '$os': "linux"
+                                            , '$browser': "Prolapse 0.1"
+                                            , '$device':  "Prolapse 0.1" }}},
+    ws_send(WS, json(Object)).
 
 ws_loop(WS, Callback) :-
     repeat,
-    read_json(WS, Msg),
+    ws_receive(WS, Msg, [format(json)]),
     abolish(heartbeatSeq/1),
-    asserta(heartbeatSeq(Msg.s)),
-    writeln(Msg.t),
-    call(Callback, Msg),
+    asserta(heartbeatSeq(Msg.data.s)),
+    call(Callback, Msg.data),
     fail.
 
 start_ws(Callback) :-
     URL = "wss://gateway.discord.gg/?v=6&encoding=json",
     writeln("Starting bot"),
     http_open_websocket(URL, WS, []),
-    read_json(WS, HELLO),
-    thread_create(heartbeat(HELLO.d.heartbeat_interval, WS), _),
+    ws_receive(WS, HELLO, [format(json)]),
+    thread_create(heartbeat(HELLO.data.d.heartbeat_interval, WS), _),
     me(token, Token),
     identify_client(WS, Token),
     ws_loop(WS, Callback).

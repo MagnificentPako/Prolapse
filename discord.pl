@@ -4,10 +4,6 @@
 
 :- initialization(main, main).
 
-:- dynamic ping/1.
-:- dynamic heartbeatSeq/1.
-:- dynamic me/1, me/2.
-
 callback(Msg) :-
     raw_plugin(Msg.t, Msg).
 
