@@ -1,6 +1,11 @@
 :- [http_client].
 :- [ws_client].
 
+
+:- dynamic ping/1.
+:- dynamic heartbeatSeq/1.
+:- dynamic me/1.
+
 callback(Token, Msg) :-
     Msg.t = "MESSAGE_CREATE",
     (\+ me(Msg.d.author.id)),
