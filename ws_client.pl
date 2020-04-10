@@ -29,22 +29,26 @@ identify_client(WS, Token) :-
     atom_json_dict(JJ, Object, []),
     ws_send(WS, text(JJ)).
 
-ws_loop(Token, WS, Callback) :-
+ws_loop(WS, Callback) :-
+    me(token, Token),
     repeat,
     read_json(WS, Msg),
     abolish(heartbeatSeq/1),
-    assert(heartbeatSeq(Msg.s)),
+    asserta(heartbeatSeq(Msg.s)),
+    writeln(Msg.t),
     call(Callback, Token, Msg),
     fail.
 
-start_ws(Token, Callback) :-
+start_ws(Callback) :-
     URL = "wss://gateway.discord.gg/?v=6&encoding=json",
-    write("Starting Bot"), nl,
+    writeln("Starting bot"),
     http_open_websocket(URL, WS, []),
     read_json(WS, HELLO),
     thread_create(heartbeat(HELLO.d.heartbeat_interval, WS), _),
+    me(token, Token),
     identify_client(WS, Token),
-    ws_loop(Token, WS, Callback).
+    ws_loop(WS, Callback).
+
 %% caching code stuf
 :- dynamic user/2.
 

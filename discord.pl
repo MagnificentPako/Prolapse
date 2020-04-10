@@ -4,7 +4,7 @@
 
 :- dynamic ping/1.
 :- dynamic heartbeatSeq/1.
-:- dynamic me/1.
+:- dynamic me/1, me/2.
 
 callback(Token, Msg) :-
     Msg.t = "MESSAGE_CREATE",
@@ -17,14 +17,16 @@ callback(Token, Msg) :-
 
 callback(_, Msg) :-
     Msg.t = "READY",
-    assert(me(Msg.d.user.id)).
+    asserta(me(Msg.d.user.id)).
 
-start_with_token :-
-    start_ws("some token", callback).words(S, W) :- split_string(S, " ", "", W).
-words(S, W) :- split_string(S, " ", "", W).
-unwords(W, S) :-
-    reverse(W, R),
-    foldl(string_concat, R, "", S).
+run_bot :-
+    read_token(Token),
+    asserta(me(token, Token)),
+    start_ws(callback).
+
+read_token(Token) :-
+    open(".token", read, Stream),
+    read_line_to_string(Stream, Token).
 
 handle_command(Msg, Res) :-
     string_concat("::", Rest, Msg),
