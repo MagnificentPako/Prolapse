@@ -20,7 +20,7 @@ handle_user_command(Msg) :-
 handle_user_command(_, not_saved).
 
 
-% not quite working yet
+:- multifile command_handler/3.
 command_handler("echo", _, Msg) :-
     string_concat("::echo ", Rest, Msg.d.content),
     send_message(Msg.d.channel_id, Rest).
