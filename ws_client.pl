@@ -7,8 +7,10 @@
 
 heartbeat(Time, WS) :-
     repeat,
-    sleep(Time / 1000),
+    Seconds is Time / 1000,
+    sleep(Seconds),
     heartbeatSeq(S),
+    writeln("Heartbeating"),
     Object = json{ op:1, d:S},
     atom_json_dict(J, Object, []),
     ws_send(WS, text(J)),
@@ -16,7 +18,7 @@ heartbeat(Time, WS) :-
 
 read_json(WS, J) :-
     ws_receive(WS, Reply),
-    atom_json_dict(Reply.data, J, []).  
+    atom_json_dict(Reply.data, J, []).
 
 identify_client(WS, Token) :-
     Object = json{ op:2
