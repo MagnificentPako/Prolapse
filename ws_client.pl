@@ -12,7 +12,7 @@ heartbeat(Time, WS) :-
     Object = json{ op:1, d:S},
     atom_json_dict(J, Object, []),
     ws_send(WS, text(J)),
-    1 < 0.
+    fail.
 
 read_json(WS, J) :-
     ws_receive(WS, Reply),
@@ -33,7 +33,7 @@ ws_loop(Token, WS, Callback) :-
     abolish(heartbeatSeq/1),
     assert(heartbeatSeq(Msg.s)),
     call(Callback, Token, Msg),
-    1 < 0.
+    fail.
 
 start_ws(Token, Callback) :-
     URL = "wss://gateway.discord.gg/?v=6&encoding=json",
