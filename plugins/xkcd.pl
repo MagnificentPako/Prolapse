@@ -9,6 +9,5 @@ command_handler("xkcd", [], Msg) :- !,
     send_xkcd(Msg, Res).
 
 command_handler("xkcd", [Id|_], Msg) :- !,
-    writeln("running xkcd command"), 
     http_get("https://xkcd.com/$Id/info.0.json", Res, [json_object(dict)]),
     send_xkcd(Msg, Res).

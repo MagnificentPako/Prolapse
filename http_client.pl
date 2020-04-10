@@ -25,7 +25,6 @@ request(R, Url, Res) :-
     ua(Ua),
     sformat(Auth, "Bot ~w", [Token]),
     req_options(Auth, Ua, O),
-    writeln("sending request"),
     do_request(R, Url, Res, O).
 
 do_send_message(Channel, Message) :-
