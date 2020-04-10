@@ -19,17 +19,28 @@ req_options(Auth, Ua, Options) :-
 
 do_request(get, Url, Res, O)        :- http_get(Url, Res, O).
 do_request(post(Data), Url, Res, O) :- http_post(Url, Data, Res, O).
-
+ 
 request(R, Url, Res) :-
     me(token, Token),
     ua(Ua),
     sformat(Auth, "Bot ~w", [Token]),
     req_options(Auth, Ua, O),
+    writeln("sending request"),
     do_request(R, Url, Res, O).
 
-send_message(Channel, Message) :-
+do_send_message(Channel, Message) :-
     endpoint("channels/~w/messages", [Channel], Url),
-    request(post(json(_{ content:Message })), Url, _).
+    request(post(json(Message)), Url, _).
+
+send_message(Channel, Message) :-
+    string(Message),
+    (\+ is_dict(Message)),
+    do_send_message(Channel, _{ content: Message }).
+
+send_message(Channel, Message) :-
+    is_dict(Message),
+    writeln('sending'),
+    do_send_message(Channel, Message).
 
 get_guild(GuildId, Guild) :-
     endpoint("guilds/~w", [GuildId], Url),
