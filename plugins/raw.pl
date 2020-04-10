@@ -13,4 +13,5 @@ raw_plugin("READY", Msg) :-
 raw_plugin("MESSAGE_CREATE", Msg) :-
     format("~s says: ~s\n", [Msg.d.author.username, Msg.d.content]).
 raw_plugin("MESSAGE_CREATE", Msg) :-
-   handle_user_command(Msg).
+    \+ me(id, Msg.d.author.id),
+    handle_user_command(Msg).
