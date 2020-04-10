@@ -1,17 +1,19 @@
 
 
-handle_command(Msg, _) :-
-   format("Handling command ~s\n", [Msg]), fail.
-handle_command(Msg, Res) :-
-    string_concat("::", Rest, Msg),
+handle_user_command(Msg) :-
+   format("Trying to run command ~s\n", [Msg.d.content]), fail.
+handle_user_command(Msg) :-
+    string_concat("::", Rest, Msg.d.content),
     split_string(Rest, " ", "", [Cmd|Args]),
     command_handler(Cmd, Args, Msg), !.
-handle_command(_, not_saved).
+handle_user_command(_, not_saved).
 
 
+% not quite working yet
 command_handler("echo", Args, Msg) :-
     writeln(Args),
-    send_message(Msg.d.channel_id, Args).
+    print_term(Msg, []).
+    %% send_message(Msg.d.channel_id, Args).
 %% command_handler("eval", [Args], Res) :-
 %%     atom_string(A, Args),
 %%     writeln(Args),
