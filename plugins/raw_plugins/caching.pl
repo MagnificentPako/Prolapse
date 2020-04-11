@@ -3,14 +3,16 @@
 :- multifile command_handler/3.
 :- multifile user_plugin/2.
 
+:- use_module(library(pprint)).
+
 user_plugin("cache", handle_cache_command).
 user_plugin("cache", another_handler).
 user_plugin("list_plugins", list_plugins).
 
 list_plugins(_, Msg) :-
     findall(user_plugin(P, H), user_plugin(P, H), Ps),
-    term_string(Ps, Str),
-    codeblock(Str, Res),
+    with_output_to(string(Pretty), listing(user_plugin)),
+    codeblock(Pretty, Res),
     reply(Msg, Res).
 
 handle_cache_command(_, Msg) :-
