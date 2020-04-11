@@ -1,11 +1,11 @@
 :- [http_client].
 :- [ws_client].
-:- [plugins/raw].
+:- [plugins/raw_plugins].
 
 :- initialization(main, main).
 
 callback(Msg) :-
-    raw_plugin(Msg.t, Msg).
+    run_raw_plugins(Msg.t, Msg).
 
 run_bot :-
     read_token(Token),
