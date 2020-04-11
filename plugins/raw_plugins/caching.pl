@@ -6,20 +6,10 @@
 :- use_module(library(pprint)).
 
 user_plugin("cache", handle_cache_command).
-user_plugin("cache", another_handler).
-user_plugin("list_plugins", list_plugins).
 
-list_plugins(_, Msg) :-
-    findall(user_plugin(P, H), user_plugin(P, H), Ps),
-    with_output_to(string(Pretty), listing(user_plugin)),
-    codeblock(Pretty, Res),
-    reply(Msg, Res).
 
 handle_cache_command(_, Msg) :-
     reply(Msg, "cache command").
-
-another_handler(_, Msg) :-
-    reply(Msg, "foo").
 
 
 :- multifile raw_plugin/2.
