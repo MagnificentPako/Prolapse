@@ -13,7 +13,16 @@
 handle_user_command(Msg) :-
     string_concat("::", Rest, Msg.d.content),
     split_string(Rest, " ", "", [Cmd|Args]),
-    run_user_plugin(Cmd, Args, Msg).
+    catch(
+        run_user_plugin(Cmd, Args, Msg),
+        Exception,
+        (
+            term_string(Exception, AsString),
+            codeblock(AsString, "prolog", CB),
+            format(string(Error), "An error occurred:\n ~s", [CB]),
+            reply(Msg, Error)
+        )
+    ).
 
 run_user_plugin(Command, _, Msg) :-
     \+ user_plugin(Command, _),
