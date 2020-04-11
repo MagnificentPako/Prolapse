@@ -3,7 +3,6 @@
 :- multifile command_handler/3.
 :- multifile user_plugin/2.
 
-
 user_plugin("cache", handle_cache_command).
 user_plugin("cache", another_handler).
 user_plugin("list_plugins", list_plugins).
@@ -14,7 +13,7 @@ list_plugins(_, Msg) :-
     codeblock(Str, Res),
     reply(Msg, Res).
 
-handle_cache_command(Args, Msg) :-
+handle_cache_command(_, Msg) :-
     reply(Msg, "cache command").
 
 another_handler(_, Msg) :-
@@ -25,7 +24,7 @@ another_handler(_, Msg) :-
 raw_plugin("GUILD_CREATE", initial_cache).
 
 initial_cache(Msg) :-
-    select_dict(_{members: Ms, channels: C}, Msg.d, _),
+    select_dict(_{members: Ms, channels: _}, Msg.d, _),
     forall(member(M, Ms), cache_user(M.user)).
 
 %% cache_user(User) :- format("Caching user ~s\n", User.username), fail.

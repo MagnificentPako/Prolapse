@@ -1,8 +1,6 @@
-:- [user_plugins].
-:- [raw_plugins/chat].
-:- [raw_plugins/ready].
-:- [raw_plugins/user_commands].
-:- [raw_plugins/caching].
+:- [plugins/user_plugins].
+
+:- expand_file_name("plugins/raw_plugins/*", Files), load_files(Files, []).
 
 :- multifile raw_plugin/2.
 

@@ -1,6 +1,6 @@
 :- [http_client].
-:- [user_plugins/xkcd].
-:- [user_plugins/reload].
+
+:- expand_file_name("plugins/user_plugins/*", Files), load_files(Files, []).
 
 :- use_module(library(http/json)).
 :- use_module(library(http/json_convert)).
