@@ -38,9 +38,13 @@ send_message(Channel, Message) :-
 
 send_message(Channel, Message) :-
     is_dict(Message),
-    writeln('sending'),
     do_send_message(Channel, Message).
 
 get_guild(GuildId, Guild) :-
     endpoint("guilds/~w", [GuildId], Url),
     request(get, Url, Guild).
+
+
+%% reply to ToMsg with SendMsg
+reply(ToMsg, SendMsg) :-
+    send_message(ToMsg.d.channel_id, SendMsg).
