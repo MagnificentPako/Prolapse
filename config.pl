@@ -14,5 +14,12 @@ load_token :-
     read_line_to_string(Stream, Token),
     set_config(token, Token).
 
+load_admins :-
+    %% sbrg
+    set_config(admin, "215398803220463616"),
+    %% pako
+    set_config(admin, "139395104455524352").
+
 load_config :-
+    load_admin,
     load_token.
