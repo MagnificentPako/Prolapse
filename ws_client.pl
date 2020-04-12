@@ -28,6 +28,7 @@ ws_loop(WS, Callback) :-
     ws_receive(WS, Msg, [format(json)]),
     abolish(heartbeatSeq/1),
     asserta(heartbeatSeq(Msg.data.s)),
+    writeln(Msg.data.t),
     call(Callback, Msg.data),
     fail.
 
