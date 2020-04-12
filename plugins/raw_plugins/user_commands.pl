@@ -1,3 +1,4 @@
+:- [util].
 :- [plugins/user_plugins].
 
 :- dynamic eval_message/1.
@@ -7,5 +8,5 @@
 raw_plugin("MESSAGE_UPDATE", user_command_plugin).
 raw_plugin("MESSAGE_CREATE", user_command_plugin).
 user_command_plugin(Msg) :-
-    \+ me(id, Msg.d.author.id),
+    not_from_me(Msg),
     handle_user_command(Msg).

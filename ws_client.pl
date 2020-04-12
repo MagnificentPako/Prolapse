@@ -4,7 +4,6 @@
 :- use_module(library(http/http_client)).
 :- use_module(library(http/http_json)).
 :- dynamic heartbeatSeq/1.
-:- dynamic me/2.
 
 heartbeat(Time, WS) :-
     repeat,
@@ -38,7 +37,7 @@ start_ws(Callback) :-
     http_open_websocket(URL, WS, []),
     ws_receive(WS, HELLO, [format(json)]),
     thread_create(heartbeat(HELLO.data.d.heartbeat_interval, WS), _),
-    me(token, Token),
+    get_config(token, Token),
     identify_client(WS, Token),
     ws_loop(WS, Callback).
 

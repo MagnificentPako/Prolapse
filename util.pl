@@ -14,3 +14,8 @@ codeblock(Str, Res) :-
 codeblock(Str, Lang, Res) :-
     phrase(cb(Str, Lang), As),
     string_codes(Res, As).
+
+
+not_from_me(Msg) :-
+    get_config(id, MyId),
+    MyId \= Msg.d.author.id.

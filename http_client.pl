@@ -2,6 +2,8 @@
 :- use_module(library(http/json_convert)).
 :- use_module(library(http/http_client)).
 :- use_module(library(http/http_json)).
+:- [config].
+
 
 :- dynamic me/2.
 
@@ -23,7 +25,7 @@ do_request(patch(Data), Url, Res, O) :- http_patch(Url, Data, Res, O).
 
  
 request(R, Url, Res) :-
-    me(token, Token),
+    get_config(token, Token),
     ua(Ua),
     sformat(Auth, "Bot ~w", [Token]),
     req_options(Auth, Ua, O),
