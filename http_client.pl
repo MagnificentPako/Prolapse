@@ -19,6 +19,8 @@ req_options(Auth, Ua, Options) :-
 
 do_request(get, Url, Res, O)        :- http_get(Url, Res, O).
 do_request(post(Data), Url, Res, O) :- http_post(Url, Data, Res, O).
+do_request(patch(Data), Url, Res, O) :- http_patch(Url, Data, Res, O).
+
  
 request(R, Url, Res) :-
     me(token, Token),
@@ -27,18 +29,29 @@ request(R, Url, Res) :-
     req_options(Auth, Ua, O),
     do_request(R, Url, Res, O).
 
-do_send_message(Channel, Message) :-
+do_send_message(Channel, Message, Res) :-
     endpoint("channels/~w/messages", [Channel], Url),
-    request(post(json(Message)), Url, _).
+    request(post(json(Message)), Url, Res).
+
+do_edit_message(Channel, MsgId, Message, Res) :-
+    endpoint("channels/~w/messages/~w", [Channel, MsgId], Url),
+    request(patch(json(Message)), Url, Res).
+
+edit_message(Channel, MsgId, NewMessage, Res) :-
+    do_edit_message(Channel, MsgId, _{ content: NewMessage}, Res).
 
 send_message(Channel, Message) :-
+    send_message(Channel, Message, _).
+
+send_message(Channel, Message, Res) :-
     string(Message),
-    (\+ is_dict(Message)),
-    do_send_message(Channel, _{ content: Message }).
+    !,
+    do_send_message(Channel, _{ content: Message }, Res).
 
-send_message(Channel, Message) :-
+send_message(Channel, Message, Res) :-
     is_dict(Message),
-    do_send_message(Channel, Message).
+    !,
+    do_send_message(Channel, Message, Res).
 
 get_guild(GuildId, Guild) :-
     endpoint("guilds/~w", [GuildId], Url),
@@ -48,3 +61,6 @@ get_guild(GuildId, Guild) :-
 %% reply to ToMsg with SendMsg
 reply(ToMsg, SendMsg) :-
     send_message(ToMsg.d.channel_id, SendMsg).
+
+reply(ToMsg, SendMsg, Res) :-
+    send_message(ToMsg.d.channel_id, SendMsg, Res).
