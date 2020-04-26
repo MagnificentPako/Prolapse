@@ -1,9 +1,7 @@
-:- [util].
+:- ensure_loaded(util).
 
 :- multifile command_handler/3.
 :- multifile user_plugin/2.
-
-:- use_module(library(pprint)).
 
 user_plugin("cache", handle_cache_command).
 

@@ -1,8 +1,3 @@
-:- use_module(library(http/websocket)).
-:- use_module(library(http/json)).
-:- use_module(library(http/json_convert)).
-:- use_module(library(http/http_client)).
-:- use_module(library(http/http_json)).
 :- dynamic heartbeatSeq/1.
 :- dynamic me/2.
 
