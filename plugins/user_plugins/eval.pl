@@ -1,7 +1,3 @@
-:- [http_client].
-:- [util].
-
-
 :- dynamic have_responded_to/2.
 :- dynamic user_plugin/2.
 :- multifile user_plugin/2.
@@ -28,11 +24,13 @@ undef_plugin([Arg], Msg) :-
 ask_plugin(Args, Msg) :-
     have_responded_to(Msg.d.id, MyReplyId),
     !,
-    do_eval(Args, NewResult),
+    sub_string(Msg.d.content, 6, _, 0, Content),
+    do_eval(Content, NewResult),
     edit_message(Msg.d.channel_id, MyReplyId, NewResult, _).
 
 ask_plugin(Args, Msg) :-
-    do_eval(Args, CB),
+    sub_string(Msg.d.content, 6, _, 0, Content),
+    do_eval(Content, CB),
     reply(Msg, CB, Res),
     Tag = have_responded_to(Msg.d.id, Res.id),
     format("Saving ~p\n", [Tag]),
@@ -50,10 +48,17 @@ do_eval(Args, Res) :-
     ).
 
 
-do_eval_throws(Args, CB) :-
-    atomic_list_concat(Args, " ", A),
-    read_term_from_atom(A, T, []),
-    T,
+do_eval_throws(Content, CB) :-
+    %with_output_to(string(Str), call(T)),
+    %aggregate_all(bag(X), T, Result),
+    %writeln(Result),
+    %term_to_atom(Result, Str),
+    text_to_string(Content, Content_),
+    atom_string(Atom, Content_),
+    atom_to_term(Atom, Result, []),
+    writeln(Result),
+    free_variables(Result, _, [], Vars),
+    writeln(Vars),
+    Str = "",
     !,
-    term_string(T, Str),
     codeblock(Str, "prolog", CB).
