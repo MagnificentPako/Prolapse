@@ -21,5 +21,5 @@ load_admins :-
     set_config(admin, "139395104455524352").
 
 load_config :-
-    load_admin,
+    load_admins,
     load_token.
