@@ -11,10 +11,12 @@
 :- multifile user_plugin/2.
 
 handle_user_command(Msg) :-
-    string_concat("::", Rest, Msg.d.content),
-    split_string(Rest, " ", "", [Cmd|Args]),
     catch(
-        run_user_plugin(Cmd, Args, Msg),
+        (
+            string_concat("::", Rest, Msg.d.content),
+            split_string(Rest, " ", "", [Cmd|Args]),
+            run_user_plugin(Cmd, Args, Msg)
+        ),
         Exception,
         (
             term_string(Exception, AsString),
