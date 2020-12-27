@@ -1,6 +1,7 @@
 :- [http_client].
 :- [util].
 
+:- use_module(library(sandbox)).
 
 :- dynamic have_responded_to/2.
 :- dynamic user_plugin/2.
@@ -10,6 +11,48 @@
 user_plugin("def", def_plugin).
 user_plugin("ask", ask_plugin).
 user_plugin("undef", undef_plugin).
+user_plugin("eval", eval_plugin).
+
+run_code(true).
+run_code((A, B)) :-
+    run_code(goal(A)),
+    run_code(goal(B)).
+run_code(goal(G)) :-
+    run_goal(G).
+
+run_goal(goal(G)) :-
+    format("run_goal: ~w\n", [G]), fail.
+run_goal(G) :-
+    safe_goal(G),
+    G.
+
+
+run_eval(Msg, parse_code(Code, Vars)) :-
+    format(string(Str), "Running code ~w\n", [Code]),
+    reply(Msg, Str),
+    run_code(goal(Code)),
+    !,
+    member(Name = Result, Vars),
+    format(string(Reply), "~w = ~w\n", [Name, Result]),
+    reply(Msg, Reply).
+    
+
+% given a list of atoms, parse to prolog code
+parse_code(ArgList, parse_code(Code, Vars)) :-
+    atomic_list_concat(ArgList, " ", Atom),
+    read_term_from_atom(
+        Atom,
+        Code,
+        [
+            variable_names(Vars)
+        ]
+    ).
+
+eval_plugin(Args, Msg) :-
+    writeln(Args),
+    parse_code(Args, Code),
+    format(string(Str), "~w", [Code]),
+    run_eval(Msg, Code).
 
 
 def_plugin(Args, Msg) :-
@@ -48,7 +91,6 @@ do_eval(Args, Res) :-
             format(string(Res), "An error occurred:\n ~s", [CB])
         )
     ).
-
 
 do_eval_throws(Args, CB) :-
     atomic_list_concat(Args, " ", A),
