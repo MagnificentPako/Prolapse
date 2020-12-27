@@ -51,7 +51,6 @@ parse_code(ArgList, parse_code(Code, Vars)) :-
 eval_plugin(Args, Msg) :-
     writeln(Args),
     parse_code(Args, Code),
-    format(string(Str), "~w", [Code]),
     run_eval(Msg, Code).
 
 

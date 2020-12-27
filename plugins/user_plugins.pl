@@ -1,12 +1,4 @@
-:- [http_client].
-
 :- expand_file_name("plugins/user_plugins/*", Files), load_files(Files, []).
-
-:- use_module(library(http/json)).
-:- use_module(library(http/json_convert)).
-:- use_module(library(http/http_client)).
-:- use_module(library(http/http_json)).
-:- use_module(library(interpolate)).
 
 :- multifile user_plugin/2.
 

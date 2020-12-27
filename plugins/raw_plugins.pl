@@ -1,4 +1,4 @@
-:- [plugins/user_plugins].
+:- ensure_loaded(plugins/user_plugins).
 
 :- expand_file_name("plugins/raw_plugins/*", Files), load_files(Files, []).
 

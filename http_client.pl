@@ -1,17 +1,11 @@
-:- use_module(library(http/json)).
-:- use_module(library(http/json_convert)).
-:- use_module(library(http/http_client)).
-:- use_module(library(http/http_json)).
-:- [config].
-
+:- style_check(-singleton).
 
 :- dynamic me/2.
 
 ua(Ua) :- Ua = "Prolapse (https://github.com/MagnificentPako/Prolapse, 0.1)".
 
 endpoint(Segment, Params, Url) :-
-    string_concat("https://discordapp.com/api/v6/", Segment, Url_),
-    sformat(Url, Url_, Params).
+    sformat(Url, 'https://discordapp.com/api/v6/$Segment', Params).
 
 req_options(Auth, Ua, Options) :- 
     Options = [ request_header(authorization=Auth)
@@ -25,7 +19,7 @@ do_request(patch(Data), Url, Res, O) :- http_patch(Url, Data, Res, O).
 
  
 request(R, Url, Res) :-
-    get_config(token, Token),
+    me(token, Token),
     ua(Ua),
     sformat(Auth, "Bot ~w", [Token]),
     req_options(Auth, Ua, O),

@@ -1,5 +1,4 @@
-:- [http_client].
-
+:- style_check(-singleton).
 :- multifile user_plugin/2.
 
 user_plugin("xkcd", handler).

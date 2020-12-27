@@ -3,4 +3,5 @@
 raw_plugin("MESSAGE_CREATE", chat_plugin).
 
 chat_plugin(Msg) :-
-    format("~s says: ~s\n", [Msg.d.author.username, Msg.d.content]).
+    get_dict(author, Msg.d, Author) ->
+        format("~s says: ~s\n", [Author.username, Msg.d.content]).
