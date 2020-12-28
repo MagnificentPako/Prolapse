@@ -7,7 +7,8 @@
        reply/2,
        reply/3,
        edit_message/4,
-       create_reaction/2
+       create_reaction/2,
+       get_gateway_bot/1
      ]
    ).
 
@@ -93,6 +94,9 @@ get_guild(GuildId, Guild) :-
     endpoint("guilds/~w", [GuildId], Url),
     request(get, Url, Guild).
 
+get_gateway_bot(Res) :-
+    endpoint("gateway/bot", [], Url),
+    request(get, Url, Res).
 
 %% reply to ToMsg with SendMsg
 reply(ToMsg, SendMsg) :-

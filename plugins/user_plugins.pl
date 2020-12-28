@@ -19,13 +19,15 @@ handle_user_command(Msg) :-
             run_user_plugin(Cmd, Args, Msg)
         ),
         Exception,
-        (
-            term_string(Exception, AsString),
-            codeblock(AsString, "prolog", CB),
-            format(string(Error), "An error occurred:\n ~s", [CB]),
-            reply(Msg, Error)
-        )
+        handle_command_exception(Exception, Msg)
     ).
+
+handle_command_exception(Exception, Msg) :-
+    with_output_to(string(AsString), print_message(error, Exception)),
+    codeblock(AsString, "prolog", CB),
+    format(string(Error), "An error occurred:\n ~s", [CB]),
+    reply(Msg, Error).
+    
 
 load_user_plugins :-
     writeln("Loading user plugins"),

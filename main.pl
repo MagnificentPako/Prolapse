@@ -1,4 +1,3 @@
-%% :- set_prolog_flag(verbose_file_search, true).
 prolapse_version(1.0).
 
 % The file_search_path/2 predicate is a built in which
@@ -14,13 +13,13 @@ file_search_path(prolapse, Dir) :-
     file_directory_name(File, Dir).
 
 :- use_module(library(prolog_stack)).
+:- use_module(library(debug)).
 
 :- use_module(prolapse(http_lib)).
-:- use_module(prolapse(ws_client)).
 :- use_module(prolapse(config)).
 :- use_module(prolapse(plugins/raw_plugins)).
 :- use_module(prolapse(plugins/user_plugins)).
-
+:- use_module(prolapse(discord/shard)).
 
 :- initialization(main, main).
 
@@ -28,13 +27,20 @@ run_bot :-
     load_token,
     load_raw_plugins,
     load_user_plugins,
-    start_ws.
+    debug(debug),
+    start_shards.
+    %% start_ws.
 
 main :-
     catch_with_backtrace(
       run_bot,
       E,
-      writeln(E)
+      handle_main_exception(E)
     ).
+
+handle_main_exception(E) :-
+    print_message(errror, E).
+
+%% :- check.
 
 

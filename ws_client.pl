@@ -53,20 +53,3 @@ start_ws(Callback) :-
 
 start_ws :-
     start_ws(callback).
-
-%% caching code stuf
-:- dynamic user/2.
-
-fetch_from_network(user(UserId), Res) :-
-    %% simulate network request
-    sleep(2),
-    %% store user in cache
-    User = some_user,
-    (retract(user(UserId, User)) ; asserta(user(UserId, User))),
-    Res = User.
-
-get_from_cache(user(UserId), Res) :- user(UserId, Res).
-
-get_user(UserId, Res) :- get_from_cache(user(UserId), Res), !.
-get_user(UserId, Res) :- fetch_from_network(user(UserId), Res), !.
-

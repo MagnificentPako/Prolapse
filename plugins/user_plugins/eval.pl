@@ -3,28 +3,28 @@
        [user_plugin/2]
    ).
 
-%% :- use_module(library(sandbox)).
+:- use_module(library(sandbox)).
 
-%% :- use_module(prolapse(http_lib)).
+:- use_module(prolapse(http_lib)).
+:- use_module(prolapse(util)).
 
-%% :- [http_client].
-%% :- [util].
+safe_goal(_) :- fail.
 
 user_plugin("def", def_plugin).
 user_plugin("ask", ask_plugin).
 user_plugin("undef", undef_plugin).
-user_plugin("eval", eval_plugin).
+user_plugin("eval", eval:eval_plugin).
 
 run_code(true).
 run_code((A, B)) :-
     run_code(goal(A)),
     run_code(goal(B)).
 run_code(goal(G)) :-
-    run_goal(G).
+    run_goal(goal(G)).
 
 run_goal(goal(G)) :-
     format("run_goal: ~w\n", [G]), fail.
-run_goal(G) :-
+run_goal(goal(G)) :-
     safe_goal(G),
     G.
 
@@ -64,23 +64,23 @@ def_plugin(Args, Msg) :-
     T,
     reply(Msg, "Defined.").
 
-undef_plugin([Arg], Msg) :-
-    atom_string(A, Arg),
-    retractall(A),
-    reply(Msg, "Undefined.").
+%% undef_plugin([Arg], Msg) :-
+%%     atom_string(A, Arg),
+%%     retractall(A),
+%%     reply(Msg, "Undefined.").
 
-ask_plugin(Args, Msg) :-
-    have_responded_to(Msg.d.id, MyReplyId),
-    !,
-    do_eval(Args, NewResult),
-    edit_message(Msg.d.channel_id, MyReplyId, NewResult, _).
+%% ask_plugin(Args, Msg) :-
+%%     have_responded_to(Msg.d.id, MyReplyId),
+%%     !,
+%%     do_eval(Args, NewResult),
+%%     edit_message(Msg.d.channel_id, MyReplyId, NewResult, _).
 
-ask_plugin(Args, Msg) :-
-    do_eval(Args, CB),
-    reply(Msg, CB, Res),
-    Tag = have_responded_to(Msg.d.id, Res.id),
-    format("Saving ~p\n", [Tag]),
-    assertz(Tag).
+%% ask_plugin(Args, Msg) :-
+%%     do_eval(Args, CB),
+%%     reply(Msg, CB, Res),
+%%     Tag = have_responded_to(Msg.d.id, Res.id),
+%%     format("Saving ~p\n", [Tag]),
+%%     assertz(Tag).
 
 do_eval(Args, Res) :-
     catch(

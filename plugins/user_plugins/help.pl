@@ -4,7 +4,7 @@
    ).
 
 :- use_module(prolapse(util)).
-:- use_module(prolapse(http_lib), [reply/2]).
+:- use_module(prolapse(http_lib), [reply/2, create_reaction/2]).
 
 
 user_plugin("list_plugins", help:list_plugins).
@@ -25,4 +25,5 @@ list_plugins(_, Msg) :-
     ),
     codeblock(Output, "prolog", Help),
     %% term_string(P, Res),
-    reply(Msg, Help).
+    reply(Msg, Help),
+    create_reaction(Msg, "👍").
