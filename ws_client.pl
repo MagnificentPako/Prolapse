@@ -1,3 +1,15 @@
+:- module(
+     ws_client,
+     [
+       start_ws/0,
+       heartbeatSeq/1
+     ]
+   ).
+:- use_module(library(http/websocket)).
+
+:- use_module(prolapse(plugins/raw_plugins)).
+
+
 :- dynamic heartbeatSeq/1.
 
 heartbeat(Time, WS) :-
@@ -26,6 +38,9 @@ ws_loop(WS, Callback) :-
     call(Callback, Msg.data),
     fail.
 
+callback(Msg) :-
+    run_raw_plugins(Msg.t, Msg).
+
 start_ws(Callback) :-
     URL = "wss://gateway.discord.gg/?v=6&encoding=json",
     writeln("Starting bot"),
@@ -35,6 +50,9 @@ start_ws(Callback) :-
     get_config(token, Token),
     identify_client(WS, Token),
     ws_loop(WS, Callback).
+
+start_ws :-
+    start_ws(callback).
 
 %% caching code stuf
 :- dynamic user/2.
@@ -51,3 +69,4 @@ get_from_cache(user(UserId), Res) :- user(UserId, Res).
 
 get_user(UserId, Res) :- get_from_cache(user(UserId), Res), !.
 get_user(UserId, Res) :- fetch_from_network(user(UserId), Res), !.
+

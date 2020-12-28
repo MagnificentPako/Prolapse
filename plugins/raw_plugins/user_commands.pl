@@ -1,12 +1,17 @@
-:- [util].
-:- [plugins/user_plugins].
+:- module(
+     user_commands,
+     [raw_plugin/2]
+   ).
 
-:- dynamic eval_message/1.
-:- multifile raw_plugin/2.
+
+:- use_module(prolapse(plugins/user_plugins)).
+
 
 %% TODO: Currently all plugins react to edits...
-raw_plugin("MESSAGE_UPDATE", user_command_plugin).
-raw_plugin("MESSAGE_CREATE", user_command_plugin).
+raw_plugin("MESSAGE_UPDATE", user_commands:user_command_plugin).
+raw_plugin("MESSAGE_CREATE", user_commands:user_command_plugin).
 user_command_plugin(Msg) :-
-    not_from_me(Msg),
+    %% true.
+    %% not_from_me(Msg),
+    writeln("Handling"),
     handle_user_command(Msg).

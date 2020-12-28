@@ -1,10 +1,15 @@
-:- multifile user_plugin/2.
+:- module(
+     reload,
+     [user_plugin/2]
+   ).
 
-user_plugin("reload", do_reload).
+:- use_module(prolapse(plugins/raw_plugins), [load_raw_plugins/0]).
+:- use_module(prolapse(plugins/user_plugins), [load_user_plugins/0]).
+
+
+user_plugin("reload", reload:do_reload).
 do_reload(_, Msg) :-
-    writeln("loading plugins"),
-    expand_file_name("plugins/raw_plugins/*", Files),
-    writeln(Files),
-    load_files(Files, []),
+    load_raw_plugins,
+    load_user_plugins,
     make,
     reply(Msg, "Reloaded.").

@@ -1,9 +1,18 @@
-:- expand_file_name("plugins/user_plugins/*", Files), load_files(Files, []).
+:- module(
+       user_plugins,
+       [
+           handle_user_command/1,
+           run_user_plugin/3,
+           load_user_plugins/0
+       ]
+   ).
+%% :- expand_file_name("plugins/user_plugins/*", Files), load_files(Files, []).
 
-:- multifile user_plugin/2.
+:- use_module(prolapse(util)).
+:- use_module(prolapse(plugins), [load_plugins/3]).
 
 handle_user_command(Msg) :-
-    catch(
+    catch_with_backtrace(
         (
             string_concat("::", Rest, Msg.d.content),
             split_string(Rest, " ", "", [Cmd|Args]),
@@ -18,12 +27,23 @@ handle_user_command(Msg) :-
         )
     ).
 
-run_user_plugin(Command, _, Msg) :-
-    \+ user_plugin(Command, _),
-    format(atom(Reply), "~s is not a valid command(run_user_plugin).", [Command]),
-    reply(Msg, Reply).
+load_user_plugins :-
+    writeln("Loading user plugins"),
+    load_plugins("plugins/user_plugins", user_plugin, Ps),
+    writeln("Loaded"),
+    save_stuff(user_plugins, Ps).
+
+%% run_user_plugin(Command, _, Msg) :-
+%%     \+ user_plugin(Command, _),
+%%     format(atom(Reply), "~s is not a valid command(run_user_plugin).", [Command]),
+%%     reply(Msg, Reply).
 run_user_plugin(Command, Args, Msg) :-
-    user_plugin(Command, Handler),
-    format("Calling plugin ~a\n", [Handler]),
+    not_from_me(Msg),
+    get_stuff(user_plugins, Ps),
+    member(
+        plugin(Command, Handler),
+        Ps
+    ),
+    format("Calling plugin ~w\n", [Handler]),
     call(Handler, Args, Msg).
 

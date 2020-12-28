@@ -1,9 +1,27 @@
-:- use_module(library(dcg/basics)).
-:- use_module(library(dcg/high_order)).
-:- use_module(library(clpfd)).
-:- use_module(library(pio)).
-:- use_module(library(aggregate)).
+:- module(
+     util,
+     [
+       not_from_me/1,
+       codeblock/2,
+       codeblock/3,
+       cb/3,
+       cb/4,
+       get_msg_author/2,
+       save_stuff/2,
+       get_stuff/2
+     ]
+   ).
+:- reexport(
+     [
+       library(dcg/basics),
+       library(dcg/high_order),
+       library(clpfd),
+       library(pio),
+       library(aggregate)
+     ]
+   ).
 
+:- dynamic stuff/2.
 
 words(S, W) :- split_string(S, " ", "", W).
 unwords(W, S) :-
@@ -22,18 +40,20 @@ codeblock(Str, Lang, Res) :-
 
 not_from_me(Msg) :-
     get_config(id, MyId),
-    format("MyId is ~a\n", [MyId]),
-    (
-      get_msg_author(Msg, AuthorId),
-      dif(MyId, AuthorId)
-    ) ; true.
+    get_msg_author(Msg, AuthorId),
+    dif(MyId, AuthorId).
 
 % given a msg dict, return the author ID, if any
-get_msg_author(Msg, Author) :-
-    _{
-      d: _{author: _{id: Author}}
-    } :< Msg.
-    
+get_msg_author(Msg, AuthorId) :-
+    get_dict(author, Msg.d, Author),
+    get_dict(id, Author, AuthorId).
+
+save_stuff(Key, Value) :-
+    retractall(stuff(Key, _)),
+    asserta(stuff(Key, Value)).
+
+get_stuff(Key, Value) :-
+    stuff(Key, Value).
 
 % dcg utils
 lines([])     --> call(eos), !.

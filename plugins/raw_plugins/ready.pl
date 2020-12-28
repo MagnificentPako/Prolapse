@@ -1,9 +1,12 @@
-:- [config].
+:- module(
+     ready,
+     [raw_plugin/2]
+   ).
+
+:- use_module(prolapse(config)).
 
 
-:- multifile raw_plugin/2.
-
-raw_plugin("READY", ready_handler).
+raw_plugin("READY", ready:ready_handler).
 
 ready_handler(Msg) :-
     writeln("READY plugin, saving user id"),

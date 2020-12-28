@@ -1,12 +1,14 @@
-:- [http_client].
-:- [util].
+:- module(
+       eval,
+       [user_plugin/2]
+   ).
 
-:- use_module(library(sandbox)).
+%% :- use_module(library(sandbox)).
 
-:- dynamic have_responded_to/2.
-:- dynamic user_plugin/2.
-:- multifile user_plugin/2.
+%% :- use_module(prolapse(http_lib)).
 
+%% :- [http_client].
+%% :- [util].
 
 user_plugin("def", def_plugin).
 user_plugin("ask", ask_plugin).

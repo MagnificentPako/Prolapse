@@ -1,17 +1,16 @@
-:- ensure_loaded(util).
+:- module(
+     caching,
+     [raw_plugin/2]
+   ).
 
-:- multifile command_handler/3.
-:- multifile user_plugin/2.
 
-user_plugin("cache", handle_cache_command).
-
+%% user_plugin("cache", handle_cache_command).
 
 handle_cache_command(_, Msg) :-
     reply(Msg, "cache command").
 
 
-:- multifile raw_plugin/2.
-raw_plugin("GUILD_CREATE", initial_cache).
+raw_plugin("GUILD_CREATE", caching:initial_cache).
 
 initial_cache(Msg) :-
     select_dict(_{members: Ms, channels: _}, Msg.d, _),

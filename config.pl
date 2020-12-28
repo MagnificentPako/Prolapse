@@ -1,4 +1,14 @@
-
+:- module(
+     config,
+     [
+       get_config/2,
+       set_config/2,
+       load_token/0,
+       load_admins/0,
+       load_config/0
+     ]
+   ).
+ 
 :- dynamic config/2.
 
 get_config(Key, Res) :- config(Key, Res), !.
