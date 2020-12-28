@@ -23,7 +23,7 @@ handle_user_command(Msg) :-
     ).
 
 handle_command_exception(Exception, Msg) :-
-    with_output_to(string(AsString), print_message(error, Exception)),
+    message_to_string(Exception, AsString),
     codeblock(AsString, "prolog", CB),
     format(string(Error), "An error occurred:\n ~s", [CB]),
     reply(Msg, Error).
