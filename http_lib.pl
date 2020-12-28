@@ -6,7 +6,8 @@
        get_guild/2,
        reply/2,
        reply/3,
-       edit_message/4
+       edit_message/4,
+       create_reaction/2
      ]
    ).
 
@@ -16,8 +17,6 @@
 :- use_module(library(http/json_convert)).
 
 :- use_module(prolapse(config), [get_config/2]).
-
-:- style_check(-singleton).
 
 ua(Ua) :- Ua = "Prolapse (https://github.com/MagnificentPako/Prolapse, 0.1)".
 
@@ -34,9 +33,14 @@ req_options(Auth, Ua, Options) :-
               , json_object(dict)
               ].
 
-do_request(get, Url, Res, O)        :- http_get(Url, Res, O).
-do_request(post(Data), Url, Res, O) :- http_post(Url, Data, Res, O).
-do_request(patch(Data), Url, Res, O) :- http_patch(Url, Data, Res, O).
+do_request(get, Url, Res, O) :-
+    http_get(Url, Res, O).
+do_request(post(Data), Url, Res, O) :-
+    http_post(Url, Data, Res, O).
+do_request(patch(Data), Url, Res, O) :-
+    http_patch(Url, Data, Res, O).
+do_request(put(Data), Url, Res, O) :-
+    http_put(Url, Data, Res, O).
 
  
 request(R, Url, Res) :-
@@ -59,19 +63,31 @@ edit_message(Channel, MsgId, NewMessage, Res) :-
 
 send_message(Channel, Message) :-
     send_message(Channel, Message, _).
-
 send_message(Channel, Message, Res) :-
     is_dict(Message),
     !,
     do_send_message(Channel, Message, Res).
-
 send_message(Channel, Message, Res) :-
     format(string(String), "~w", [Message]),
     !,
     do_send_message(Channel, _{ content: String }, Res).
-
-send_message(_, Msg, _) :-
+send_message(_, _, _) :-
     writeln("Failed to send message").
+
+create_reaction(Message, Emoji) :-
+    create_reaction(Message, Emoji, _).
+create_reaction(Message, Emoji, Res) :-
+    uri_normalized(Emoji, Normalized),
+    endpoint(
+      "channels/~w/messages/~w/reactions/~s/@me",
+      [Message.d.channel_id, Message.d.id, Normalized],
+      Endpoint
+    ),
+    writeln(Endpoint),
+    request(put(json(_{})), Endpoint, Res),
+    writeln("Done putting"),
+    writeln(Res).
+    
 
 get_guild(GuildId, Guild) :-
     endpoint("guilds/~w", [GuildId], Url),
