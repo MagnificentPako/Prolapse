@@ -12,7 +12,17 @@ user_plugin("help", help:list_plugins).
 
 list_plugins(_, Msg) :-
     get_stuff(user_plugins, Ps),
-    member(P, Ps),
+    with_output_to(
+      string(Output),
+      findall(
+        P,
+        (
+          member(P, Ps),
+          writeln(P)
+        ),
+        _
+      )
+    ),
+    codeblock(Output, "prolog", Help),
     %% term_string(P, Res),
-    writeln(P),
-    reply(Msg, P).
+    reply(Msg, Help).
