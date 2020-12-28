@@ -21,9 +21,9 @@
 :- use_module(prolapse(util), [dbg/2, dbg/3]).
 
 
-ua(Ua) :- Ua = "Prolapse (https://github.com/MagnificentPako/Prolapse, 0.1)".
+ua(Ua) :- Ua = "Prolord v0.1".
 
-base_url("https://discordapp.com/api/v6/").
+base_url("https://discordapp.com/api/v8/").
 
 endpoint(Segment, Params, Url) :-
     base_url(BaseUrl),
@@ -61,6 +61,7 @@ do_edit_message(Channel, MsgId, Message, Res) :-
     endpoint("channels/~w/messages/~w", [Channel, MsgId], Url),
     request(patch(json(Message)), Url, Res).
 
+
 edit_message(Channel, MsgId, NewMessage, Res) :-
     do_edit_message(Channel, MsgId, _{ content: NewMessage}, Res).
 
@@ -96,6 +97,27 @@ get_guild(GuildId, Guild) :-
 get_gateway_bot(Res) :-
     endpoint("gateway/bot", [], Url),
     request(get, Url, Res).
+
+register_slash_command(GuildId, Definition) :-
+    dbg(http, "Hej"),
+    MyAppId = 793186830430240780,
+    endpoint("applications/~w/guilds/~w/commands", [MyAppId, GuildId], Url),
+    dbg(http, "Url is ~w", [Url]),
+    request(post(json(Definition)), Url, Res),
+    dbg(http, "SLash res: ~w", [Res]).
+
+reply_interaction(InteractionMsg, SendMsg) :-
+    endpoint(
+      "interactions/~w/~w/callback",
+      [
+        InteractionMsg.t.interaction_id,
+        InteractionMsg.t.interaction_token
+      ],
+      Url
+    ),
+    request(post(json(SendMsg)), Url, Res),
+    dbg(http, "reply_interaction res: ~w", [Res]).
+
 
 %% reply to ToMsg with SendMsg
 reply(ToMsg, SendMsg) :-
