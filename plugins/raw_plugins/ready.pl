@@ -4,10 +4,11 @@
    ).
 
 :- use_module(prolapse(config)).
+:- use_module(prolapse(util), [dbg/2]).
 
 
 raw_plugin("READY", ready:ready_handler).
 
 ready_handler(Msg) :-
-    writeln("READY plugin, saving user id"),
+    dbg(raw_plugin, "READY plugin, saving user id"),
     set_config(id, Msg.d.user.id).

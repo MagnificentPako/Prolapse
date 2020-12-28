@@ -43,7 +43,7 @@ callback(Msg) :-
 
 start_ws(Callback) :-
     URL = "wss://gateway.discord.gg/?v=6&encoding=json",
-    writeln("Starting bot"),
+    dbg(info, "Starting bot"),
     http_open_websocket(URL, WS, []),
     ws_receive(WS, HELLO, [format(json)]),
     thread_create(heartbeat(HELLO.data.d.heartbeat_interval, WS), _),

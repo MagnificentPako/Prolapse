@@ -18,6 +18,8 @@
 :- use_module(library(http/json_convert)).
 
 :- use_module(prolapse(config), [get_config/2]).
+:- use_module(prolapse(util), [dbg/2, dbg/3]).
+
 
 ua(Ua) :- Ua = "Prolapse (https://github.com/MagnificentPako/Prolapse, 0.1)".
 
@@ -73,7 +75,7 @@ send_message(Channel, Message, Res) :-
     !,
     do_send_message(Channel, _{ content: String }, Res).
 send_message(_, _, _) :-
-    writeln("Failed to send message").
+    dbg(http, "Failed to send message").
 
 create_reaction(Message, Emoji) :-
     create_reaction(Message, Emoji, _).
@@ -84,10 +86,7 @@ create_reaction(Message, Emoji, Res) :-
       [Message.d.channel_id, Message.d.id, Normalized],
       Endpoint
     ),
-    writeln(Endpoint),
-    request(put(json(_{})), Endpoint, Res),
-    writeln("Done putting"),
-    writeln(Res).
+    request(put(json(_{})), Endpoint, Res).
     
 
 get_guild(GuildId, Guild) :-
@@ -100,7 +99,7 @@ get_gateway_bot(Res) :-
 
 %% reply to ToMsg with SendMsg
 reply(ToMsg, SendMsg) :-
-    format("Replying with ~w\n", [SendMsg]),
+    dbg(http, "Replying with ~w\n", [SendMsg]),
     send_message(ToMsg.d.channel_id, SendMsg).
 
 reply(ToMsg, SendMsg, Res) :-

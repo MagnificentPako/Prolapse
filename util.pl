@@ -8,7 +8,9 @@
        cb/4,
        get_msg_author/2,
        save_stuff/2,
-       get_stuff/2
+       get_stuff/2,
+       dbg/2,
+       dbg/3
      ]
    ).
 :- reexport(
@@ -22,6 +24,11 @@
    ).
 
 :- dynamic stuff/2.
+
+dbg(Topic, Format) :-
+    dbg(Topic, Format, []).
+dbg(Topic, Format, Args) :-
+    debug(prolapse(Topic), Format, Args).
 
 words(S, W) :- split_string(S, " ", "", W).
 unwords(W, S) :-

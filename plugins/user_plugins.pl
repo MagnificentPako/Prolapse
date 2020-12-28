@@ -30,9 +30,9 @@ handle_command_exception(Exception, Msg) :-
     
 
 load_user_plugins :-
-    writeln("Loading user plugins"),
+    dbg(plugins, "Loading user plugins"),
     load_plugins("plugins/user_plugins", user_plugin, Ps),
-    writeln("Loaded"),
+    dbg(plugins, "Loaded"),
     save_stuff(user_plugins, Ps).
 
 %% run_user_plugin(Command, _, Msg) :-
@@ -46,6 +46,6 @@ run_user_plugin(Command, Args, Msg) :-
         plugin(Command, Handler),
         Ps
     ),
-    format("Calling plugin ~w\n", [Handler]),
+    dbg(user_plugins, "Calling plugin ~w\n", [Handler]),
     call(Handler, Args, Msg).
 

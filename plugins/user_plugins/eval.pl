@@ -23,7 +23,7 @@ run_code(goal(G)) :-
     run_goal(goal(G)).
 
 run_goal(goal(G)) :-
-    format("run_goal: ~w\n", [G]), fail.
+    dbg(plugin(eval), "run_goal: ~w\n", [G]), fail.
 run_goal(goal(G)) :-
     safe_goal(G),
     G.

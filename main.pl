@@ -23,13 +23,13 @@ file_search_path(prolapse, Dir) :-
 
 :- initialization(main, main).
 
+:- debug(prolapse(_)).
+
 run_bot :-
     load_token,
     load_raw_plugins,
     load_user_plugins,
-    debug(debug),
     start_shards.
-    %% start_ws.
 
 main :-
     catch_with_backtrace(
@@ -44,3 +44,7 @@ handle_main_exception(E) :-
 %% :- check.
 
 
+%% :- multifile check:checker/2.
+%% mychecker :-
+%%     writeln("mychecker").
+%% check:checker(main:mychecker, "usages of writeln").

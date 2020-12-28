@@ -12,7 +12,7 @@
 
 
 load_raw_plugins :-
-    writeln("Loading raw plugins"),
+    dbg(plugins, "Loading raw plugins"),
     load_plugins("plugins/raw_plugins", raw_plugin, Ps),
     save_stuff(raw_plugins, Ps).
 
