@@ -12,6 +12,11 @@ file_search_path(prolapse, Dir) :-
     source_file(prolapse_version(_), File),
     file_directory_name(File, Dir).
 
+%% :- dynamic message_hook/3.
+%% :- multifile message_hook/3.
+%% message_hook(Term, debug(Topic), Lines) :-
+%%     Lines = [foo-[]].
+
 :- use_module(library(prolog_stack)).
 :- use_module(library(debug)).
 
@@ -27,6 +32,7 @@ file_search_path(prolapse, Dir) :-
 run_bot :-
     load_token,
     load_bot_plugins,
+    %% true.
     start_shards.
 
 main :-

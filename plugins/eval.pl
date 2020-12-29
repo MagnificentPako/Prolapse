@@ -5,6 +5,7 @@
 
 :- use_module(library(sandbox)).
 
+
 :- use_module(prolapse(http_lib)).
 :- use_module(prolapse(util)).
 :- use_module(prolapse(db)).
@@ -12,10 +13,11 @@
 
 % safe_goal(_) :- fail.
 
-plugin(prefix("def"), def_plugin).
-plugin(prefix("ask"), ask_plugin).
-plugin(prefix("undef"), undef_plugin).
+%% plugin(prefix("def"), def_plugin).
+%% plugin(prefix("ask"), ask_plugin).
+%% plugin(prefix("undef"), undef_plugin).
 plugin(prefix("eval"), eval:eval_plugin).
+
 
 run_code(true).
 run_code((A, B)) :-
@@ -29,7 +31,6 @@ run_goal(goal(G)) :-
 run_goal(goal(G)) :-
     safe_call(G).
     %% G.
-
 
 run_eval(Msg, parse_code(Code, Vars)) :-
     format(string(Str), "Running code ~w\n", [Code]),

@@ -8,23 +8,25 @@
      ]
    ).
 
+:- use_module(prolapse(http_lib)).
 :- use_module(prolapse(util)).
 
+% TODO: refactor to new file and improve
 plugin_type(raw(_)).
 plugin_type(prefix(_)).
 plugin_type(slash_command(_)).
 
-valid_plugin(plugin(Type, _)) :-
-  plugin_type(Type), !.
-valid_plugin((plugin(Type, _))) :-
-  \+ plugin_type(Type),
-  throw(error(invalid_plugin_type, Type)).
+error:has_type(plugin_type, X) :-
+  plugin_type(X).
 
-load_plugins(BasePath, Plugins) :-
+valid_plugin(plugin(Type, _)) :-
+  must_be(plugin_type, Type).
+
+load_modules_and_exports(BasePath, Modules) :-
   string_concat(BasePath, "/*.pl", GlobPath),
   expand_file_name(GlobPath, Files),
   findall(
-    plugin(Type, Handler),
+    module(Module, Exports),
     (
       % for every file
       member(File, Files),
@@ -43,20 +45,73 @@ load_plugins(BasePath, Plugins) :-
       % this is required to recover the module identifier from the file path
       module_property(Module, file(AbsPath)),
       % get the module exports
-      module_property(Module, exports(E)),
-      member(plugin/2, E),
-      Module:plugin(Type, Handler),
-      Handler = _:_,
-      dbg(plugins, "Loaded plugin ~w ~w", [Type, Handler])
+      module_property(Module, exports(Exports))
     ),
-    Plugins
+    Modules
+  ).
+
+slash_run_handler(OrigHandler, Msg) :-
+  dbg(plugins, "Inside eval slash handler"),
+  call(OrigHandler, Msg).
+
+slash_register(BuildDef, ReadyMsg) :-
+  call(BuildDef, Definition),
+  dbg(plugins, "~w", [Definition]),
+  get_dict(guilds, ReadyMsg.d, RawGuilds),
+  maplist(get_dict(id), RawGuilds, Guilds),
+  forall(
+    member(Guild, Guilds),
+    register_slash_command(Guild, Definition)
+  ).
+
+% process_plugin takes a plugin and returns a list of handlers
+process_plugin(P, [P]) :-
+  P = plugin(PT, _),
+  (
+    PT = raw(_) ;
+    PT = prefix(_)
+  ).
+process_plugin(plugin(slash_command(BuildDefinition), Handler), [Register, Handle]) :-
+  Register =
+  plugin(
+    raw("READY"),
+    plugins:slash_register(BuildDefinition)
+  ),
+  Handle =
+  plugin(
+    raw("INTERACTION_CREATE"),
+    plugins:slash_run_handler(Handler)
+  ).
+  
+
+
+load_plugins(BasePath, Plugins) :-
+  load_modules_and_exports(BasePath, Modules),
+  findall(
+    Plugs,
+    ( 
+      member(module(Module, Exports), Modules),
+      member(plugin/2, Exports),
+      Module:plugin(PluginType, Handler),
+      valid_plugin(plugin(PluginType, Handler)),
+      Handler = _:_,
+      process_plugin(plugin(PluginType, Handler), Plugs)
+    ),
+    NestedPlugins
+  ),
+  flatten(NestedPlugins, Plugins),
+  dbg(plugins, "Loaded plugins:" ),
+  sort(Plugins, Sorted),
+  forall(
+    member(plugin(Type, Handler), Sorted),
+    dbg(plugins, "~5+~w ~30+~w", [Type, Handler])
   ).
 
 load_bot_plugins :-
-  dbg(plugins, "Loading bot plugins"),
+  dbg(plugins, "-- Loading plugins"),
   load_plugins("plugins",  Ps),
-  save_stuff(plugins, Ps).
-
+  save_stuff(plugins, Ps),
+  dbg(plugins, "-- Plugins loaded.").
 
 run_plugins(Msg) :-
   get_stuff(plugins, Plugins),
@@ -72,7 +127,7 @@ run_plugins(Msg) :-
 
 handle_plugin_exception(Exception, _Msg) :-
     message_to_string(Exception, AsString),
-    debug(plugins, "~s", AsString).
+    dbg(plugins, "~s", AsString).
     %% codeblock(AsString, "prolog", CB),
     %% format(string(Error), "An error occurred:\n ~s", [CB]),
     %% reply(Msg, Error).
@@ -80,7 +135,7 @@ handle_plugin_exception(Exception, _Msg) :-
 run_if_match(plugin(Type, Handler), Msg) :-
   %% dbg(plugins, "Matching ~w <-> ~w", [Type, Msg.t]),
   match(Type, Msg),
-  not_from_me(Msg),
+  %% not_from_me(Msg),
   dbg(plugins, "t = ~w h = ~w", [Type, Handler]),
   call(Handler, Msg).
 % either we match and call the plugin or we don't match and don't
@@ -97,4 +152,3 @@ match(prefix(Cmd), Msg) :-
   string_concat(WithPrefix, _, Msg.d.content).
   
       
-%% match(T, _) :- dbg(plugins, "Couldn't match type ~w", [T]), fail.

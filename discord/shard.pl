@@ -13,13 +13,14 @@
 :- use_module(prolapse(discord/opcodes), [gateway_op/2]).
 :- use_module(prolapse(plugins), [run_plugins/1]).
 :- use_module(prolapse(util)).
+:- use_module(prolapse(event)).
 
 
 
 :- dynamic shard_heartbeat_seq/2.
 
 spawn_shards(WSS, Callback, Shards, IDs) :-
-    debug(debug, "Starting ~w shards", [Shards]),
+    dbg(debug, "Starting ~w shards", [Shards]),
     N is Shards - 1,
     findall(
       ThreadId
@@ -32,6 +33,7 @@ callback(Msg, _ShardId) :-
     get_dict(data, Msg, Data),
     dif(Data.t, null),
     dbg(ws, "~w", [Data.t]),
+    run_listeners(Data),
     run_plugins(Data).
 
 start_shards :-
@@ -48,7 +50,7 @@ create_shard(WSS, [ShardId, ShardNum], Callback, ThreadId) :-
     thread_create(shard(WSS, [ShardId, ShardNum], Callback), ThreadId).
 
 shard(WSS, [ShardId, ShardNum], Callback) :- 
-    debug(debug, "Shard ~w Created", [ShardId]),
+    dbg(debug, "Shard ~w Created", [ShardId]),
     http_open_websocket(WSS, Socket, []),
     ws_receive(Socket, HELLO, [format(json)]),
     thread_create(shard_heartbeat(Socket, HELLO.data.d.heartbeat_interval, ShardId), Beat),

@@ -7,7 +7,9 @@
    ).
 :- use_module(library(http/websocket)).
 
-:- use_module(prolapse(plugins/raw_plugins)).
+%% :- use_module(prolapse(plugins/raw_plugins)).
+:- use_module(prolapse(util)).
+
 
 
 :- dynamic heartbeatSeq/1.
@@ -18,6 +20,7 @@ heartbeat(Time, WS) :-
     sleep(Seconds),
     heartbeatSeq(S),
     Object = json{ op:1, d:S},
+    dbg(websocket, "Ping ~w", [S]),
     ws_send(WS, json(Object)),
     fail.
 

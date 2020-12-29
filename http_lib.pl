@@ -100,12 +100,10 @@ get_gateway_bot(Res) :-
     request(get, Url, Res).
 
 register_slash_command(GuildId, Definition) :-
-    dbg(http, "Hej"),
+    dbg(http, "Registering slash command"),
     MyAppId = 793186830430240780,
     endpoint("applications/~w/guilds/~w/commands", [MyAppId, GuildId], Url),
-    dbg(http, "Url is ~w", [Url]),
-    request(post(json(Definition)), Url, Res),
-    dbg(http, "SLash res: ~w", [Res]).
+    request(post(json(Definition)), Url, Res).
 
 reply_interaction(InteractionMsg, SendMsg) :-
     endpoint(
