@@ -49,7 +49,9 @@ codeblock(Str, Lang, Res) :-
 not_from_me(Msg) :-
     get_config(id, MyId),
     get_msg_author(Msg, AuthorId),
+    !,
     dif(MyId, AuthorId).
+not_from_me(_).
 
 % given a msg dict, return the author ID, if any
 get_msg_author(Msg, AuthorId) :-

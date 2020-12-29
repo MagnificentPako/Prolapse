@@ -80,6 +80,7 @@ handle_plugin_exception(Exception, _Msg) :-
 run_if_match(plugin(Type, Handler), Msg) :-
   %% dbg(plugins, "Matching ~w <-> ~w", [Type, Msg.t]),
   match(Type, Msg),
+  not_from_me(Msg),
   dbg(plugins, "t = ~w h = ~w", [Type, Handler]),
   call(Handler, Msg).
 % either we match and call the plugin or we don't match and don't
