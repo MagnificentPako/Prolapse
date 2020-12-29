@@ -51,7 +51,7 @@ load_modules_and_exports(BasePath, Modules) :-
   ).
 
 slash_run_handler(OrigHandler, Msg) :-
-  dbg(plugins, "Inside eval slash handler"),
+  dbg(plugins, "Inside plugin slash handler"),
   call(OrigHandler, Msg).
 
 slash_register(BuildDef, ReadyMsg) :-

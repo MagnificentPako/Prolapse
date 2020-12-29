@@ -16,54 +16,58 @@ slash_handler(Msg) :-
   json_write(current_output, Msg),
   writeln("Slash handler").
 
-build_definition(
-  _{
-    name: "prolord",
-    description: "Interact with prolord",
-    options: Opts 
-  }
-) :-
-  RunCommand =
-  _{
-    type: 1,
-    name: "Command",
-    description: "Run a command",
-    options: Opts
-  },
+build_definition(Def) :-
   get_stuff(plugins, Plugins),
-  build_options_from_plugins(Plugins, Opts).
+  build_options_from_plugins(Plugins, Opts),
+  app_command_dict(
+    app_command(
+      "run",
+      "Run a command",
+      Opts
+    ),
+    Def
+  ).
 
 build_options_from_plugins(Plugins, Opts) :-
   findall(
-    P,
+    option(string, Prefix, Prefix),
     (
       member(P, Plugins),
-      P = plugin(prefix(_), Handler)
+      P = plugin(prefix(Prefix), _),
+      dbg(foo, "~w", [P])
     ),
-    PrefixPlugins
-  ),
-  maplist(to_option, PrefixPlugins, Opts).
-
-
-:- begin_tests(foo).
-
-test(foo) :-
-  build_options_from_plugins(
-    [plugin(prefix(foo), handler)],
-    X
+    Opts
   ).
 
-:- end_tests(foo).
-  
-
-to_option(
-  plugin(prefix(C), _),
+app_command_dict(
+  app_command(Name, Description, Options),
   _{
-    name: C,
-    description: C,
-    type: 1
+    name: Name,
+    description: Description,
+    options: Commands
   }
-).
+) :-
+  maplist(option_dict, Options, Commands).
+
+option_dict(
+  option(Type, Name, Description),
+  _{
+    type: IType,
+    name: Name,
+    description: Description
+  }
+) :-
+  option_type(IType, Type).
+
+option_type(1, subcommand).
+option_type(2, subcommand_group).
+option_type(3, string).
+option_type(4, integer).
+option_type(5, boolean).
+option_type(6, user).
+option_type(7, channel).
+option_type(8, role).
+  
 
 handler(Msg) :-
   reply(Msg, "Test works").
