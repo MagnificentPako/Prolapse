@@ -1,15 +1,13 @@
 :- module(
        user_plugins,
        [
-           handle_user_command/1,
-           run_user_plugin/3,
-           load_user_plugins/0
+           handle_user_command/1
        ]
    ).
 %% :- expand_file_name("plugins/user_plugins/*", Files), load_files(Files, []).
 
 :- use_module(prolapse(util)).
-:- use_module(prolapse(plugins), [load_plugins/3]).
+:- use_module(prolapse(plugins), [load_plugins/2]).
 
 handle_user_command(Msg) :-
     catch_with_backtrace(
@@ -28,12 +26,6 @@ handle_command_exception(Exception, Msg) :-
     format(string(Error), "An error occurred:\n ~s", [CB]),
     reply(Msg, Error).
     
-
-load_user_plugins :-
-    dbg(plugins, "Loading user plugins"),
-    load_plugins("plugins/user_plugins", user_plugin, Ps),
-    dbg(plugins, "Loaded"),
-    save_stuff(user_plugins, Ps).
 
 %% run_user_plugin(Command, _, Msg) :-
 %%     \+ user_plugin(Command, _),

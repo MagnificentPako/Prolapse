@@ -8,7 +8,8 @@
        reply/3,
        edit_message/4,
        create_reaction/2,
-       get_gateway_bot/1
+       get_gateway_bot/1,
+       register_slash_command/2
      ]
    ).
 

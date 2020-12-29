@@ -1,17 +1,24 @@
 :- module(
      help,
-     [user_plugin/2]
+     [plugin/2]
    ).
 
 :- use_module(prolapse(util)).
 :- use_module(prolapse(http_lib), [reply/2, create_reaction/2]).
 
 
-user_plugin("list_plugins", help:list_plugins).
-user_plugin("help", help:list_plugins).
+plugin(prefix("list_plugins"), help:list_plugins).
+plugin(prefix("help"), help:list_plugins).
 
-list_plugins(_, Msg) :-
-    get_stuff(user_plugins, Ps),
+list_plugins(Msg) :-
+    get_stuff(plugins, AllPlugins),
+    findall(
+      P,
+      ( member(P, AllPlugins),
+        P = plugin(prefix(_), _)
+      ),
+      Ps
+    ),
     with_output_to(
       string(Output),
       findall(

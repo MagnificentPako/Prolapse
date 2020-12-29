@@ -1,13 +1,13 @@
 :- module(
      units,
-     [user_plugin/2]
+     [plugin/2]
    ).
 
 :- use_module(prolapse(util)).
 :- use_module(unit_db).
 
 
-user_plugin("units", units:convert_handler).
+plugin(prefix("units"), units:convert_handler).
 
 conversion_request(convert_unit(Val, From, To)) -->
   num(Val), unit(From), middle, unit(To).

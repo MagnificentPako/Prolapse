@@ -11,7 +11,9 @@
 :- use_module(prolapse(http_lib)).
 :- use_module(prolapse(discord/shard)).
 :- use_module(prolapse(discord/opcodes), [gateway_op/2]).
-:- use_module(prolapse(plugins/raw_plugins), [run_raw_plugins/2]).
+:- use_module(prolapse(plugins), [run_plugins/1]).
+:- use_module(prolapse(util)).
+
 
 
 :- dynamic shard_heartbeat_seq/2.
@@ -26,8 +28,11 @@ spawn_shards(WSS, Callback, Shards, IDs) :-
           , sleep(5.2))
       , IDs).
 
-callback(Msg, ShardId) :-
-    run_raw_plugins(Msg.data.t, Msg.data).
+callback(Msg, _ShardId) :-
+    get_dict(data, Msg, Data),
+    dif(Data.t, null),
+    dbg(ws, "~w", [Data.t]),
+    run_plugins(Data).
 
 start_shards :-
     setup_gateway(callback).
@@ -35,7 +40,7 @@ start_shards :-
 setup_gateway(Callback) :-
     get_gateway_bot(Res),
     format(string(WSS), "~w/?v=6&encoding=json", [Res.url]),
-    spawn_shards(WSS, Callback, 1, [ID|IDs]),
+    spawn_shards(WSS, Callback, 1, [ID|_]),
     thread_join(ID).
 
 

@@ -17,8 +17,7 @@ file_search_path(prolapse, Dir) :-
 
 :- use_module(prolapse(http_lib)).
 :- use_module(prolapse(config)).
-:- use_module(prolapse(plugins/raw_plugins)).
-:- use_module(prolapse(plugins/user_plugins)).
+:- use_module(prolapse(plugins)).
 :- use_module(prolapse(discord/shard)).
 
 :- initialization(main, main).
@@ -27,8 +26,7 @@ file_search_path(prolapse, Dir) :-
 
 run_bot :-
     load_token,
-    load_raw_plugins,
-    load_user_plugins,
+    load_bot_plugins,
     start_shards.
 
 main :-

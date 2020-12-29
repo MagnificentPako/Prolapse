@@ -10,7 +10,8 @@
        save_stuff/2,
        get_stuff/2,
        dbg/2,
-       dbg/3
+       dbg/3,
+       words/2
      ]
    ).
 :- reexport(
