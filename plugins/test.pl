@@ -5,21 +5,31 @@
 
 :- use_module(prolapse(http_lib), [register_slash_command/2]).
 :- use_module(prolapse(util)).
+:- use_module(library(http/json)).
+
 
 
 plugin(prefix("test"), test_plugin:handler).
 plugin(slash_command(test_plugin:build_definition), test_plugin:slash_handler).
 
 slash_handler(Msg) :-
+  json_write(current_output, Msg),
   writeln("Slash handler").
 
 build_definition(
   _{
     name: "prolord",
     description: "Interact with prolord",
-    options: Opts
+    options: Opts 
   }
 ) :-
+  RunCommand =
+  _{
+    type: 1,
+    name: "Command",
+    description: "Run a command",
+    options: Opts
+  },
   get_stuff(plugins, Plugins),
   build_options_from_plugins(Plugins, Opts).
 
@@ -51,28 +61,10 @@ to_option(
   _{
     name: C,
     description: C,
-    type: 3
+    type: 1
   }
 ).
 
 handler(Msg) :-
-  register_slash_command(
-    Msg.d.guild_id,
-    _{
-      name: "unit",
-      description: "Convert units",
-      options: [
-        _{
-          name: "Unit",
-          description: "Unit",
-          type: 3,
-          required: true,
-          choices: [
-            _{ name: "Meter", value: m }
-          ]
-        }
-      ]
-    }
-  ),
   reply(Msg, "Test works").
   
